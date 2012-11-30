@@ -1,10 +1,16 @@
-all: tunnel
-
 CC     := gcc
-CFLAGS := -Iinclude -I.
+CFLAGS := 
+TARGET := tunnel
+OBJS   := tunnel.o network.o
 
-tunnel : tunnel.c
-	$(CC) $(CFLAGS) tunnel.c -o tunnel
+all: $(TARGET)
+
+$(TARGET) : $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean :
 	rm -f tunnel
+	rm -f *.o

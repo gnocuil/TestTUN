@@ -49,6 +49,7 @@ static int tun_create(char *dev, int flags)
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     char tun_name[IFNAMSIZ] = "lw4over6";
     unsigned char buf[4096];
     unsigned char ip[4];
@@ -60,6 +61,7 @@ int main(int argc, char *argv[])
     }
     printf("TUN name is %s\n", tun_name);
 
+    set_random_mac(tun_name);
     set_mtu(tun_name, 50000);//set mtu to 50000
     interface_up(tun_name);//interface up
     //set_ipaddr(tun_name, "58.205.200.1");

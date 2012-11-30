@@ -3,6 +3,8 @@
 
 int set_mtu(char *interface_name, unsigned mtu);//ifconfig interface_name mtu xxx
 
+int set_random_mac(char *interface_name);//set random mac address
+
 int interface_up(char *interface_name);//ifconfig interface_name up
 
 int set_ipaddr(char *interface_name, char *ip);

@@ -4,6 +4,7 @@
 #include <net/if.h>
 #include <errno.h>
 #include <net/route.h>
+#include <net/if_arp.h>
 
 #include "network.h"
 
@@ -21,12 +22,41 @@ int set_mtu(char *interface_name, unsigned mtu)
 
     if(ioctl(fd, SIOCSIFMTU, &ifr) < 0)
     {
-        printf("Error up %s :%m\n",interface_name, errno);
+        printf("Error set %s mtu :%m\n",interface_name, errno);
         return -1;
     }
 
     return 0;
 }
+
+int set_random_mac(char *interface_name)
+{
+    int fd;
+    if ((fd = socket(PF_INET,SOCK_STREAM,0)) < 0) {
+        printf("Error create socket :%m\n", errno);
+        return -1;
+    }
+
+    struct ifreq ifr;
+    strcpy(ifr.ifr_name,interface_name);
+
+    ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
+
+    unsigned char addr[6] = {35};
+    int i;
+    for (i = 0; i < 6; ++i)
+        addr[i] = rand() % 256;
+    memcpy(&ifr.ifr_hwaddr.sa_data, addr, 6);
+
+    if(ioctl(fd, SIOCSIFHWADDR, &ifr) < 0)
+    {
+        printf("Error set %s mac address :%m\n",interface_name, errno);
+        return -1;
+    }
+
+    return 0;
+}
+
 
 int interface_up(char *interface_name) 
 {

@@ -1,0 +1,27 @@
+#!/bin/bash
+GW_IPV6_ADDRESS="2001:da8:bf:19::3"
+TC_IPV6_ADDRESS="2001:da8:bf:19::3"
+TI_IPV6_ADDRESS="2001:da8:bf:19::7"
+INTERFACE="eth0"
+
+export CURDIR=$(pwd)
+
+ip addr add $TI_IPV6_ADDRESS/64 dev $INTERFACE
+ip route add ::/0 via $GW_IPV6_ADDRESS
+echo "tc_ipv6_address:$TC_IPV6_ADDRESS"
+echo "ti_ipv6_address:$TI_IPV6_ADDRESS"
+
+sysctl net.ipv4.ip_forward=1
+#--------------------------------------------------------------
+
+
+
+
+
+
+
+ 
+
+
+
+

@@ -1,7 +1,7 @@
 all: tunnel
 
 CC     := gcc
-CFLAGS := -Iinclude
+CFLAGS := -Iinclude -I.
 
 tunnel : tunnel.c
 	$(CC) $(CFLAGS) tunnel.c -o tunnel

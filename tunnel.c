@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <net/route.h>
 
-#include "tunnel.h"
+#include <tunnel.h>
 
 static int interface_up(char *interface_name) 
 {

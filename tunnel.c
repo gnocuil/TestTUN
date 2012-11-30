@@ -139,6 +139,14 @@ int route_add(char * interface_name)
 }
 int main(int argc, char *argv[])
 {
+#ifdef __linux
+	puts("Running in linux!");
+#elif __APPLE__
+	puts("Running in mac os!");
+#else
+	puts("unknown OS!");
+	return 1;
+#endif
     int tun, ret;
     char tun_name[IFNAMSIZ];
     unsigned char buf[4096];

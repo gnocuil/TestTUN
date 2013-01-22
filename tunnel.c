@@ -5,6 +5,7 @@
 #include <net/if.h>
 #include <errno.h>
 #include <netinet/in.h>
+
 #ifdef __linux
 #include <linux/if_tun.h>
 #elif __APPLE__
@@ -29,7 +30,7 @@ static int tun_create(char *dev, int flags)
     }
 
     memset(&ifr, 0, sizeof(ifr));
-    ifr.ifr_flags |= flags;
+    ifr.ifr_flags |= flags | IFF_POINTOPOINT;
 
     if (*dev != '\0')
     {
@@ -46,6 +47,31 @@ static int tun_create(char *dev, int flags)
     strcpy(dev, ifr.ifr_name);
 
     return fd;
+}
+
+static int set_remote_addr(char *interface_name)
+{
+    int fd;
+    if ((fd = socket(PF_INET,SOCK_STREAM,0)) < 0) {
+        printf("Error create socket :%m\n", errno);
+        return -1;
+    }
+
+    struct ifreq ifr;
+    strcpy(ifr.ifr_name,interface_name);
+
+    /* set ip of this remote point of tunnel */
+    struct sockaddr_in6 addr;
+    addr.sin6_family = AF_INET6;
+    addr.sin6_addr = remote;
+    memcpy( &ifr.ifr_addr, &addr, sizeof(struct sockaddr_in6) );
+
+    if (ioctl(fd, SIOCSIFDSTADDR, &ifr) < 0) {
+        printf("Error set %s remote addr :%m\n",interface_name, errno);
+        return -1;
+    }
+
+    return 0;
 }
 
 static unsigned char buf0[BUF_LEN + IP6HDR_LEN];
@@ -99,7 +125,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     printf("TUN name is %s\n", tun_name);
-
+    set_remote_addr(tun_name);
     //set_random_mac(tun_name);
     set_mtu(tun_name, MTU);//set mtu to MTU
     interface_up(tun_name);//interface up
@@ -114,7 +140,8 @@ int main(int argc, char *argv[])
         if (ip_type(buf) == 4) {
             buf = add_ip6header(buf, &len);
             send6(buf, len);
-        }
+        } else
+            printf("unknown packet type : %d\n", ip_type(buf));
 //        len = write(tun, buf, len);
     }
 
